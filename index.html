@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misty Exam Helper</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        .question-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            color: #444;
+            margin-top: 0;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .btn-answer {
+            background-color: #f0f0f0;
+            color: #333;
+            text-align: left;
+            width: 100%;
+        }
+
+        .btn-answer:hover:not(:disabled) {
+            background-color: #e0e0e0;
+        }
+
+        .btn-answer:disabled {
+            background-color: #eee;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .btn-hint {
+            background-color: #17a2b8;
+            color: white;
+            float: right;
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+
+        .btn-hint:hover:not(:disabled) {
+            background-color: #138496;
+        }
+
+        .btn-hint:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .nav-buttons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .btn-nav {
+            background-color: #007bff;
+            color: white;
+            width: 120px;
+        }
+
+        .btn-nav:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-nav:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            display: none;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            min-height: 24px;
+            visibility: hidden;
+        }
+
+        .status.visible {
+            visibility: visible;
+        }
+
+        .correct {
+            color: #14712a;
+        }
+
+        .wrong {
+            color: #c00707;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Exam Session</h1>
+
+        <div class="question-card active" id="q1">
+            <button class="btn-hint" onclick="askHint(1)">Need a Hint?</button>
+            <h3>Question 1</h3>
+            <p>What is the powerhouse of the cell?</p>
+
+            <div class="options-grid">
+                <button class="btn-answer" onclick="submitAnswer(1, false)">A. Nucleus</button>
+                <button class="btn-answer" onclick="submitAnswer(1, true)">B. Mitochondria</button>
+                <button class="btn-answer" onclick="submitAnswer(1, false)">C. Ribosome</button>
+            </div>
+            <div class="status" id="status-1"></div>
+        </div>
+
+        <div class="question-card" id="q2">
+            <button class="btn-hint" onclick="askHint(2)">Need a Hint?</button>
+            <h3>Question 2</h3>
+            <p>What is the result of 5 + 3 * 2?</p>
+
+            <div class="options-grid">
+                <button class="btn-answer" onclick="submitAnswer(2, false)">A. 16</button>
+                <button class="btn-answer" onclick="submitAnswer(2, true)">B. 11</button>
+                <button class="btn-answer" onclick="submitAnswer(2, false)">C. 10</button>
+            </div>
+            <div class="status" id="status-2"></div>
+        </div>
+
+        <div class="question-card" id="q3">
+            <button class="btn-hint" onclick="askHint(3)">Need a Hint?</button>
+            <h3>Question 3</h3>
+            <p>Which event happened immediately after World War II?</p>
+
+            <div class="options-grid">
+                <button class="btn-answer" onclick="submitAnswer(3, false)">A. The Great Depression</button>
+                <button class="btn-answer" onclick="submitAnswer(3, true)">B. The Cold War</button>
+                <button class="btn-answer" onclick="submitAnswer(3, false)">C. The Industrial Revolution</button>
+            </div>
+            <div class="status" id="status-3"></div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-nav" id="nextBtn" onclick="changeQuestion(1)">Next</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        const totalQuestions = 3;
+
+        async function sendToMisty(endpoint, data = {}) {
+            try {
+                await fetch(`http://localhost:5000${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function submitAnswer(questionId, isCorrect) {
+            const statusDiv = document.getElementById(`status-${questionId}`);
+            const questionCard = document.getElementById(`q${questionId}`);
+            const buttons = questionCard.querySelectorAll('.btn-answer');
+            const hintBtn = questionCard.querySelector('.btn-hint');
+
+            buttons.forEach(btn => btn.disabled = true);
+            if (hintBtn) hintBtn.disabled = true;
+
+            statusDiv.classList.add('visible');
+
+            if (isCorrect) {
+                statusDiv.innerHTML = "Correct!";
+                statusDiv.className = "status visible correct";
+                sendToMisty('/correct');
+            } else {
+                statusDiv.innerHTML = "Incorrect.";
+                statusDiv.className = "status visible wrong";
+                sendToMisty('/incorrect');
+            }
+        }
+
+        function askHint(questionId) {
+            sendToMisty('/hint', { questionId: questionId.toString() });
+        }
+
+        function changeQuestion(direction) {
+            document.getElementById(`q${currentQuestion}`).classList.remove('active');
+
+            currentQuestion += direction;
+
+            if (currentQuestion > totalQuestions) {
+                alert("Exam Complete!");
+                return;
+            }
+
+            document.getElementById(`q${currentQuestion}`).classList.add('active');
+
+            if (currentQuestion === totalQuestions) {
+                document.getElementById('nextBtn').innerText = "Finish";
+            }
+        }
+    </script>
+</body>
+
+</html>
