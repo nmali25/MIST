@@ -4,90 +4,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Misty Exam Helper</title>
+    <title>Misty Exam Session</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f9;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            color: #333;
         }
 
-        .container {
-            width: 100%;
-        }
-
-        .question-card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        .screen {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
             display: none;
-            animation: fadeIn 0.5s;
+            animation: fadeIn 0.6s ease;
         }
 
-        .question-card.active {
+        .screen.active {
             display: block;
         }
 
         h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
+            font-size: 3em;
+            color: #4a4a4a;
+            margin-bottom: 10px;
+        }
+
+        p.subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .btn-start {
+            background: linear-gradient(to right, #11998e, #38ef7d);
+            border: none;
+            padding: 15px 50px;
+            color: white;
+            font-size: 1.5em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .btn-start:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        .timer-container {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 20px;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        .question-container {
+            text-align: left;
+            display: none;
+        }
+
+        .question-container.active {
+            display: block;
+            animation: slideIn 0.4s ease;
         }
 
         h3 {
-            color: #444;
-            margin-top: 0;
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
         }
 
         .options-grid {
             display: grid;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 25px;
         }
 
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
+        button.btn-answer {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
-            transition: background 0.2s;
-        }
-
-        .btn-answer {
-            background-color: #f0f0f0;
-            color: #333;
             text-align: left;
+            transition: all 0.2s;
+            font-family: 'Poppins', sans-serif;
             width: 100%;
         }
 
-        .btn-answer:hover:not(:disabled) {
-            background-color: #e0e0e0;
+        button.btn-answer:hover:not(:disabled) {
+            border-color: #764ba2;
+            background-color: #f9f9ff;
         }
 
-        .btn-answer:disabled {
-            background-color: #eee;
+        button.btn-answer:disabled {
+            background-color: #f5f5f5;
             color: #999;
+            border-color: #eee;
             cursor: not-allowed;
         }
 
         .btn-hint {
-            background-color: #17a2b8;
+            background-color: #ff9f43;
             color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
             float: right;
-            font-size: 14px;
-            padding: 8px 15px;
+            transition: background 0.2s;
+            font-family: 'Poppins', sans-serif;
         }
 
         .btn-hint:hover:not(:disabled) {
-            background-color: #138496;
+            background-color: #ff7f0e;
         }
 
         .btn-hint:disabled {
@@ -96,60 +149,70 @@
         }
 
         .nav-buttons {
-            margin-top: 25px;
+            margin-top: 30px;
             display: flex;
             justify-content: flex-end;
             border-top: 1px solid #eee;
             padding-top: 20px;
         }
 
-        .btn-nav {
-            background-color: #007bff;
+        .btn-next {
+            background-color: #764ba2;
             color: white;
-            width: 120px;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .btn-nav:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-nav:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            display: none;
+        .btn-next:hover {
+            background-color: #5b3a7d;
         }
 
         .status {
             margin-top: 15px;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 15px;
+            border-radius: 8px;
             text-align: center;
-            min-height: 24px;
-            visibility: hidden;
+            font-weight: bold;
+            display: none;
         }
 
         .status.visible {
-            visibility: visible;
+            display: block;
         }
 
-        .correct {
-            color: #14712a;
+        .status.correct {
+            background-color: #d4edda;
+            color: #155724;
         }
 
-        .wrong {
-            color: #c00707;
+        .status.wrong {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
             }
         }
     </style>
@@ -157,56 +220,120 @@
 
 <body>
 
-    <div class="container">
-        <h1>Exam Session</h1>
+    <div id="home-screen" class="screen active">
+        <h1>Welcome!</h1>
+        <p class="subtitle">Press 'Start' to start your test.</p>
+        <button class="btn-start" onclick="startExam()">Start Exam</button>
+    </div>
 
-        <div class="question-card active" id="q1">
-            <button class="btn-hint" onclick="askHint(1)">Need a Hint?</button>
-            <h3>Question 1</h3>
-            <p>What is the powerhouse of the cell?</p>
+    <div id="finish-screen" class="screen">
+        <h1>Thank You!</h1>
+        <p class="subtitle">You have successfully completed the exam.</p>
+    </div>
 
-            <div class="options-grid">
-                <button class="btn-answer" onclick="submitAnswer(1, false)">A. Nucleus</button>
-                <button class="btn-answer" onclick="submitAnswer(1, true)">B. Mitochondria</button>
-                <button class="btn-answer" onclick="submitAnswer(1, false)">C. Ribosome</button>
-            </div>
-            <div class="status" id="status-1"></div>
+    <div id="quiz-screen" class="screen">
+        <div class="timer-container">
+            Time Left: <span id="timer">10:00</span>
         </div>
 
-        <div class="question-card" id="q2">
-            <button class="btn-hint" onclick="askHint(2)">Need a Hint?</button>
-            <h3>Question 2</h3>
-            <p>What is the result of 5 + 3 * 2?</p>
+        <div id="q1" class="question-container active">
+            <button class="btn-hint" onclick="askHint(1)">Hint</button>
+            <h3>Question 1</h3>
+            <p>Each month, Renaldo earns a commission of 10.5% of his total sales for the month, plus a salary of
+                $2,500. If Renaldo earns $3,025 in a certain month, what were his total sales?</p>
+            <div class="options-grid">
+                <button class="btn-answer" onclick="submitAnswer(1, true)">A. 5000</button>
+                <button class="btn-answer" onclick="submitAnswer(1, false)">B. 6000</button>
+                <button class="btn-answer" onclick="submitAnswer(1, false)">C. 7000</button>
+                <button class="btn-answer" onclick="submitAnswer(1, false)">D. 8000</button>
+            </div>
+            <div id="status-1" class="status"></div>
+        </div>
 
+        <div id="q2" class="question-container">
+            <button class="btn-hint" onclick="askHint(2)">Hint</button>
+            <h3>Question 2</h3>
+            <p>At a recent dog show, there were 5 finalists. One of the finalists was awarded "Best in Show" and another
+                finalist was awarded "Honorable Mention." In how many different ways could the two awards be given out?
+            </p>
             <div class="options-grid">
                 <button class="btn-answer" onclick="submitAnswer(2, false)">A. 16</button>
-                <button class="btn-answer" onclick="submitAnswer(2, true)">B. 11</button>
-                <button class="btn-answer" onclick="submitAnswer(2, false)">C. 10</button>
+                <button class="btn-answer" onclick="submitAnswer(2, false)">B. 31</button>
+                <button class="btn-answer" onclick="submitAnswer(2, true)">C. 20</button>
+                <button class="btn-answer" onclick="submitAnswer(2, false)">D. 50</button>
             </div>
-            <div class="status" id="status-2"></div>
+            <div id="status-2" class="status"></div>
         </div>
 
-        <div class="question-card" id="q3">
-            <button class="btn-hint" onclick="askHint(3)">Need a Hint?</button>
+        <div id="q3" class="question-container">
+            <button class="btn-hint" onclick="askHint(3)">Hint</button>
             <h3>Question 3</h3>
-            <p>Which event happened immediately after World War II?</p>
-
+            <p>A certain pet store sells only dogs and cats. In March, the store sold twice as many dogs as cats. In
+                April, the store sold twice the number of dogs that it sold in March, and three times the number of cats
+                that it sold in March. If the total number of pets the store sold in March and April combined was 500,
+                how many dogs did the store sell in March?</p>
             <div class="options-grid">
-                <button class="btn-answer" onclick="submitAnswer(3, false)">A. The Great Depression</button>
-                <button class="btn-answer" onclick="submitAnswer(3, true)">B. The Cold War</button>
-                <button class="btn-answer" onclick="submitAnswer(3, false)">C. The Industrial Revolution</button>
+                <button class="btn-answer" onclick="submitAnswer(3, false)">A. 80</button>
+                <button class="btn-answer" onclick="submitAnswer(3, true)">B. 100</button>
+                <button class="btn-answer" onclick="submitAnswer(3, false)">C. 120</button>
+                <button class="btn-answer" onclick="submitAnswer(3, false)">D. 160</button>
             </div>
-            <div class="status" id="status-3"></div>
+            <div id="status-3" class="status"></div>
+        </div>
+
+        <div id="q4" class="question-container">
+            <button class="btn-hint" onclick="askHint(4)">Hint</button>
+            <h3>Question 4</h3>
+            <p>If r ≤ s ≤ t ≤ u ≤ v ≤ 110 and the average (arithmetic mean) of r, s, t, u, and v is 100, what is the
+                least possible value of r?</p>
+            <div class="options-grid">
+                <button class="btn-answer" onclick="submitAnswer(4, false)">A. 0</button>
+                <button class="btn-answer" onclick="submitAnswer(4, false)">B. 20</button>
+                <button class="btn-answer" onclick="submitAnswer(4, false)">C. 40</button>
+                <button class="btn-answer" onclick="submitAnswer(4, true)">D. 60</button>
+            </div>
+            <div id="status-4" class="status"></div>
         </div>
 
         <div class="nav-buttons">
-            <button class="btn-nav" id="nextBtn" onclick="changeQuestion(1)">Next</button>
+            <button class="btn-next" id="nextBtn" onclick="nextQuestion()">Next Question</button>
         </div>
     </div>
 
     <script>
         let currentQuestion = 1;
-        const totalQuestions = 3;
+        const totalQuestions = 4;
+        let timerInterval;
+        let timeLeft = 600;
+
+        const correctAudio = new Audio('correct.mp3');
+        const wrongAudio = new Audio('wrong.mp3');
+
+
+        function startExam() {
+            document.getElementById('home-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+            startTimer();
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    finishExam();
+                    return;
+                }
+                timeLeft--;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const secs = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${mins}:${secs}`;
+        }
 
         async function sendToMisty(endpoint, data = {}) {
             try {
@@ -216,15 +343,15 @@
                     body: JSON.stringify(data)
                 });
             } catch (err) {
-                console.error(err);
+                console.error("Error talking to Misty:", err);
             }
         }
 
         function submitAnswer(questionId, isCorrect) {
             const statusDiv = document.getElementById(`status-${questionId}`);
-            const questionCard = document.getElementById(`q${questionId}`);
-            const buttons = questionCard.querySelectorAll('.btn-answer');
-            const hintBtn = questionCard.querySelector('.btn-hint');
+            const questionDiv = document.getElementById(`q${questionId}`);
+            const buttons = questionDiv.querySelectorAll('.btn-answer');
+            const hintBtn = questionDiv.querySelector('.btn-hint');
 
             buttons.forEach(btn => btn.disabled = true);
             if (hintBtn) hintBtn.disabled = true;
@@ -234,10 +361,12 @@
             if (isCorrect) {
                 statusDiv.innerHTML = "Correct!";
                 statusDiv.className = "status visible correct";
+                correctAudio.play().catch(e => console.log("Audio play error", e));
                 sendToMisty('/correct');
             } else {
                 statusDiv.innerHTML = "Incorrect.";
                 statusDiv.className = "status visible wrong";
+                wrongAudio.play().catch(e => console.log("Audio play error", e));
                 sendToMisty('/incorrect');
             }
         }
@@ -246,20 +375,27 @@
             sendToMisty('/hint', { questionId: questionId.toString() });
         }
 
-        function changeQuestion(direction) {
+        function finishExam() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('finish-screen').classList.add('active');
+            sendToMisty('/finish');
+        }
+
+        function nextQuestion() {
             document.getElementById(`q${currentQuestion}`).classList.remove('active');
 
-            currentQuestion += direction;
+            currentQuestion++;
 
             if (currentQuestion > totalQuestions) {
-                alert("Exam Complete!");
+                finishExam();
                 return;
             }
 
             document.getElementById(`q${currentQuestion}`).classList.add('active');
 
             if (currentQuestion === totalQuestions) {
-                document.getElementById('nextBtn').innerText = "Finish";
+                document.getElementById('nextBtn').innerText = "Finish Exam";
             }
         }
     </script>

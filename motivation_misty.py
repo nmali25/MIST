@@ -10,7 +10,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-robot_ip = "192.168.0.73"
+robot_ip = "192.168.0.245"
 
 base_url = f"http://{robot_ip}/api"
 upload_url = f"{base_url}/audio"
@@ -22,9 +22,10 @@ led_url = f"{base_url}/led"
 led_transition_url = f"{base_url}/led/transition"
 
 QUESTION_HINTS = {
-    "1": "Remember, the powerhouse of the cell starts with M.",
-    "2": "Think about the order of operations. Multiply before you add.",
-    "3": "This event happened right after World War 2.",
+    "1": "If Renaldo earned $3,025, then his earnings from the commission on his sales are $3,025 minus $2,500.",
+    "2": "Any of the 5 finalists could be awarded 'Best in Show.' There are 4 choices left for 'Honorable Mention', because a different dog must be chosen.",
+    "3": " You will have to plug In the Answers, starting with the middle choice.",
+    "4": "We want to make r as small as possible while still ensuring the values add up to 500. Therefore, we want to make every other value as big as possible.",
     "default": "Take a deep breath. Read the question again slowly. You know this."
 }
 
@@ -57,11 +58,11 @@ def reset_robot():
 
 
 def thoughtful_pose():
-    requests.post(led_transition_url, json={"Red": 0, "Green": 0, "Blue": 255, "Red2": 0,
-                  "Green2": 0, "Blue2": 100, "TransitionType": "Breathe", "TimeMs": 1000})
+    requests.post(led_transition_url, json={"Red": 148, "Green": 0, "Blue": 211, "Red2": 148,
+                  "Green2": 0, "Blue2": 211, "TransitionType": "Breathe", "TimeMs": 10000000000})
     requests.post(image_url, json={"FileName": "e_Contempt.jpg"})
     requests.post(head_url, json={"Pitch": -10,
-                  "Roll": 20, "Yaw": 0, "Velocity": 40})
+                  "Roll": 20, "Yaw": 0, "Velocity": 120})
     requests.post(arm_url, json={
                   "RightArmPosition": -20, "LeftArmPosition": 80, "RightArmVelocity": 40, "LeftArmVelocity": 40})
 
@@ -70,14 +71,14 @@ def thoughtful_pose():
 def handle_correct():
     print("Received Correct Answer Trigger")
     requests.post(led_transition_url, json={"Red": 0, "Green": 255, "Blue": 0,
-                  "Red2": 0, "Green2": 0, "Blue2": 0, "TransitionType": "Blink", "TimeMs": 200})
-    requests.post(image_url, json={"FileName": "e_Ecstasy.jpg"})
+                  "Red2": 0, "Green2": 0, "Blue2": 0, "TransitionType": "Blink", "TimeMs": 40000000})
+    requests.post(image_url, json={"FileName": "e_Admiration.jpg"})
     requests.post(arm_url, json={"RightArmPosition": -90, "LeftArmPosition": -
                   90, "RightArmVelocity": 100, "LeftArmVelocity": 100})
     requests.post(head_url, json={"Pitch": -20,
                   "Roll": 0, "Yaw": 0, "Velocity": 100})
 
-    phrases = ["Woohoo! That is correct!", "Well done! Way to go!"]
+    phrases = ["Nice work! That is correct!", "Well done! Way to go!"]
     phrase = random.choice(phrases)
 
     generate_and_upload_audio(phrase, "temp_response.mp3", slow_mode=False)
@@ -91,16 +92,16 @@ def handle_correct():
 @app.route('/incorrect', methods=['POST'])
 def handle_incorrect():
     print("Received Incorrect Answer Trigger")
-    requests.post(led_transition_url, json={"Red": 255, "Green": 0, "Blue": 0,
-                  "Red2": 0, "Green2": 0, "Blue2": 0, "TransitionType": "Blink", "TimeMs": 500})
+    requests.post(led_transition_url, json={"Red": 0, "Green": 0, "Blue": 255,
+                  "Red2": 0, "Green2": 0, "Blue2": 0, "TransitionType": "Blink", "TimeMs": 4000000000})
     requests.post(image_url, json={"FileName": "e_Sadness.jpg"})
-    requests.post(head_url, json={"Pitch": 20,
+    requests.post(head_url, json={"Pitch": 10,
                   "Roll": 0, "Yaw": 0, "Velocity": 60})
     requests.post(arm_url, json={
                   "RightArmPosition": -40, "LeftArmPosition": 80, "RightArmVelocity": 50, "LeftArmVelocity": 50})
 
-    phrases = ["That's okay, we can do this!",
-               "That’s alright. You got the next one!"]
+    phrases = ["Don’t worry, that was a tough question.",
+               "Keep going! You'll get the next one!"]
     phrase = random.choice(phrases)
 
     generate_and_upload_audio(phrase, "temp_response.mp3", slow_mode=True)
@@ -124,6 +125,32 @@ def handle_hint():
     requests.post(play_url, json={"FileName": "hint.mp3"})
 
     time.sleep(6)
+    reset_robot()
+    return jsonify({"status": "success"})
+
+
+@app.route('/finish', methods=['POST'])
+def handle_finish():
+    requests.post(led_transition_url, json={
+        "Red": 0, "Green": 255, "Blue": 0,
+        "Red2": 255, "Green2": 255, "Blue2": 0,
+        "TransitionType": "Blink",
+        "TimeMs": 200
+    })
+    requests.post(image_url, json={"FileName": "e_Joy2.jpg"})
+
+    requests.post(head_url, json={"Pitch": -10,
+                  "Roll": 20, "Yaw": 0, "Velocity": 70})
+
+    requests.post(arm_url, json={
+                  "RightArmPosition": -90, "LeftArmPosition": 80, "RightArmVelocity": 60, "LeftArmVelocity": 60})
+
+    phrase = "That was a challenging set, but you did a great job sticking with it. You can relax now."
+    generate_and_upload_audio(phrase, "finish.mp3",
+                              slow_mode=False)
+    requests.post(play_url, json={"FileName": "finish.mp3"})
+
+    time.sleep(5)
     reset_robot()
     return jsonify({"status": "success"})
 
